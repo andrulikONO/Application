@@ -68,8 +68,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void createLocationRequest() {
         locationRequest = LocationRequest.create();
-        locationRequest.setInterval(10000); // 10 секунд
-        locationRequest.setFastestInterval(5000); // 5 секунд
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(5000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
