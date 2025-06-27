@@ -35,5 +35,9 @@
             android:name=".MainActivity"
             android:exported="true"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".StartDialogActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
     </application>
 </manifest>
