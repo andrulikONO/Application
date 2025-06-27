@@ -23,7 +23,7 @@
             android:value="78126b39-de8b-48e2-bee9-61283bc89a6d" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".StartActivity"
             android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -31,5 +31,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
     </application>
 </manifest>
