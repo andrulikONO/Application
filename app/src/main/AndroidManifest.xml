@@ -76,5 +76,9 @@
             android:name=".SnegurAndSkameika"
             android:exported="true"
             android:screenOrientation="portrait" />
+
+        <activity android:name=".DoveGameActivity" />
+
+
     </application>
 </manifest>
