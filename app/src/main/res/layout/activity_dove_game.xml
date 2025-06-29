@@ -16,7 +16,7 @@
         android:layout_height="80dp"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
-        android:src="@drawable/dove" />
+        android:src="@drawable/golub" />
 
     <TextView
         android:id="@+id/titleText"
