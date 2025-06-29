@@ -23,7 +23,13 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            isShrinkResources = false
         }
+    }
+    
+    androidResources {
+        noCompress += listOf("png")
+        ignoreAssetsPattern = "!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

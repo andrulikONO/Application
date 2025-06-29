@@ -22,8 +22,9 @@
             android:name="com.yandex.maps.api.v2.apikey"
             android:value="78126b39-de8b-48e2-bee9-61283bc89a6d" />
 
+        <!-- SnegurAndVodoprovod БЫЛ ПОСТАВЛЕН ДЛЯ ТЕСТА, ЕСЛИ НУЖНО ПОТЕСТИТЬ: ПОДСТАВЬТЕ СВОЙ -->
         <activity
-            android:name=".StartActivity"
+            android:name=".SnegurAndVodoprovod"
             android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -37,6 +38,42 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".StartDialogActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SnegurDialogActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SnegurAndJeweler"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SnegurAndCat"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SnegurAndGolub"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SnegurAndDog"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SnegurAndOstrovski"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SnegurAndLadia"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SnegurAndLove"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SnegurAndSkameika"
             android:exported="true"
             android:screenOrientation="portrait" />
     </application>

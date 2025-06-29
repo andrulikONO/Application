@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    tools:context=".SnegurAndOstrovski">
+
+    <!-- tools:ignore="SpeakableTextPresentCheck" - это для игнорирования некритичной ошибки-->
+    <Button
+        android:id="@+id/fullScreenButton"
+        tools:ignore="SpeakableTextPresentCheck"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/backgroundImage"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/pamatnik_ostrovski"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- затемнение фона -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/backButton"
+        android:layout_width="59dp"
+        android:layout_height="57dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:padding="0dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:text="&lt;"
+        android:textColor="@android:color/white"
+        android:textSize="29sp"
+        android:textStyle="bold"
+        app:backgroundTint="#E63973"
+        app:cornerRadius="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+
+    <ImageView
+        android:id="@+id/sngurochkaImage"
+        android:layout_width="180dp"
+        android:layout_height="240dp"
+        android:src="@drawable/snegurochka"
+        android:scaleType="fitCenter"
+        android:contentDescription="Снегурочка"
+        app:layout_constraintBottom_toTopOf="@+id/dialogBox"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/ostrovskiImage"
+        app:layout_constraintHorizontal_bias="0.4"
+        app:layout_constraintVertical_bias="0.7"
+        android:layout_marginBottom="16dp"/>
+
+    <ImageView
+        android:id="@+id/ostrovskiImage"
+        android:layout_width="180dp"
+        android:layout_height="240dp"
+        android:src="@drawable/ostrovski"
+        android:scaleType="fitCenter"
+        android:contentDescription="Островский"
+        app:layout_constraintBottom_toTopOf="@+id/dialogBox"
+        app:layout_constraintStart_toEndOf="@+id/sngurochkaImage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.6"
+        app:layout_constraintVertical_bias="0.7"
+        android:layout_marginBottom="16dp"/>
+
+
+    <FrameLayout
+        android:id="@+id/dialogBox"
+        android:layout_width="0dp"
+        android:layout_height="140dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/dialog_box_background"
+        android:elevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/dialogText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="text"
+            android:textSize="23sp"
+            android:textColor="@android:color/black"
+            android:padding="24dp"
+            android:textStyle="bold"
+            android:gravity="center_vertical"
+            android:fontFamily="sans-serif-black"
+            android:lineSpacingExtra="4sp"
+            android:maxLines="3"
+            android:ellipsize="end"/>
+    </FrameLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
