@@ -81,10 +81,10 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/nextButton"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="75dp"
         android:text="Следующая скульптура"
         android:textColor="@android:color/white"
-        android:textSize="20sp"
+        android:textSize="25sp"
         android:textStyle="bold"
         android:visibility="gone"
         app:backgroundTint="#E63973"
