@@ -27,7 +27,8 @@
         android:text="Помоги мне взлететь!"
         android:textColor="@android:color/black"
         android:textSize="48sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:textAlignment="center"/>
 
     <TextView
         android:id="@+id/nextText"
