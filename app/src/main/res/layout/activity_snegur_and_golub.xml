@@ -146,7 +146,7 @@
     <FrameLayout
         android:id="@+id/dialogBox"
         android:layout_width="0dp"
-        android:layout_height="140dp"
+        android:layout_height="230dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="24dp"
@@ -161,14 +161,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="text"
-            android:textSize="23sp"
+            android:textAlignment="viewStart"
+            android:textSize="19sp"
             android:textColor="@android:color/black"
             android:padding="24dp"
             android:textStyle="bold"
-            android:gravity="center_vertical"
             android:fontFamily="sans-serif-black"
             android:lineSpacingExtra="4sp"
-            android:maxLines="3"
+            android:maxLines="7"
             android:ellipsize="end"/>
     </FrameLayout>
 
