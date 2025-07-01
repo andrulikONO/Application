@@ -35,6 +35,13 @@ public class SnegurAndLove extends AppCompatActivity {
                 "Любовь: — Мы поможем! Он говорил, что пойдет смотреть, как Ладья смотрится при закате. Спроси у нее!"
         };
 
+        Runnable onDialogsComplete = () -> {
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("move_to_next", true);
+            setResult(RESULT_OK, resultIntent);
+            finish();
+        };
+
         DialogManager dialogManager = new DialogManager(
                 dialogs,
                 dialogText,
@@ -47,8 +54,12 @@ public class SnegurAndLove extends AppCompatActivity {
                 "Снегурочка",
                 "Любовь",
                 null,
-                () -> startActivity(new Intent(this, SnegurAndLadia.class)),
+                onDialogsComplete, // Используем callback для завершения
                 null
         );
+
+        backButton.setOnClickListener(v -> {
+            finish();
+        });
     }
 }

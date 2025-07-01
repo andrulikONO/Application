@@ -37,6 +37,13 @@ public class SnegurAndCat extends AppCompatActivity {
                 "Кот: — Мррр... Неплохо, неплохо,  Теперь о твоем Островском... Честно говоря, мне лень что-то вспоминать. Но! У пса нюх хороший. Он точно след учует. Беги к нему, пока я... э-э-э... обдумываю твой вопрос.",
         };
 
+        Runnable onDialogsComplete = () -> {
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("move_to_next", true);
+            setResult(RESULT_OK, resultIntent);
+            finish();
+        };
+
         DialogManager dialogManager = new DialogManager(
                 dialogs,
                 dialogText,
@@ -49,9 +56,12 @@ public class SnegurAndCat extends AppCompatActivity {
                 "Снегурочка",
                 "Кот",
                 null,
-                () -> startActivity(new Intent(this, SnegurAndDog.class)),
-                () -> startActivity(new Intent(this, KotGameActivity.class))  // // TODO сделать навигацию на игру, когда ее сделают вообще
+                onDialogsComplete, // Используем callback для завершения
+                () -> startActivity(new Intent(this, KotGameActivity.class))
         );
 
+        backButton.setOnClickListener(v -> {
+            finish();
+        });
     }
 }

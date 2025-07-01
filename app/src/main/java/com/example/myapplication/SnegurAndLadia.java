@@ -36,6 +36,13 @@ public class SnegurAndLadia extends AppCompatActivity {
                 "Ладья: — Нет, дитя, я только что вернулась с рыбалки. Но знаю, водопроводчик на улице 1 Мая мог его видеть. Возьми эту рыбу в дорогу - вдруг пригодится!",
         };
 
+        Runnable onDialogsComplete = () -> {
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("move_to_next", true);
+            setResult(RESULT_OK, resultIntent);
+            finish();
+        };
+
         DialogManager dialogManager = new DialogManager(
                 dialogs,
                 dialogText,
@@ -48,8 +55,12 @@ public class SnegurAndLadia extends AppCompatActivity {
                 "Снегурочка",
                 "Ладья",
                 null,
-                () -> startActivity(new Intent(this, SnegurAndVodoprovod.class)),
-                () -> startActivity(new Intent(this, RookGameActivity.class)) // TODO сделать навигацию на игру, когда ее сделают вообще
+                onDialogsComplete, // Используем callback для завершения
+                () -> startActivity(new Intent(this, RookGameActivity.class))
         );
+
+        backButton.setOnClickListener(v -> {
+            finish();
+        });
     }
 }
