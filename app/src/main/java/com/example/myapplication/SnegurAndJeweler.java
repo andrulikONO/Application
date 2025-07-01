@@ -41,6 +41,13 @@ public class SnegurAndJeweler extends AppCompatActivity {
                 "Снегурочка: — Спасибо вам большое!"
         };
 
+        Runnable onDialogsComplete = () -> {
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("move_to_next", true);
+            setResult(RESULT_OK, resultIntent);
+            finish();
+        };
+
         DialogManager dialogManager = new DialogManager(
                 dialogs,
                 dialogText,
@@ -53,8 +60,12 @@ public class SnegurAndJeweler extends AppCompatActivity {
                 "Снегурочка",
                 "Ювелир",
                 null,
-                () -> startActivity(new Intent(this, SnegurAndSkameika.class)),
-                null // TODO сделать навигацию на игру, когда ее сделают вообще
+                onDialogsComplete, // Используем callback для завершения
+                () -> startActivity(new Intent(this, SnegurAndJeweler.class))
         );
+
+        backButton.setOnClickListener(v -> {
+            finish();
+        });
     }
 }

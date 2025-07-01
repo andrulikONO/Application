@@ -43,6 +43,13 @@ public class SnegurAndSkameika extends AppCompatActivity {
                 "Скамья примирения: — Пустяки, Удачи в поисках! И помни - иногда чтобы найти, нужно сначала потеряться."
         };
 
+        Runnable onDialogsComplete = () -> {
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("move_to_next", true);
+            setResult(RESULT_OK, resultIntent);
+            finish();
+        };
+
         DialogManager dialogManager = new DialogManager(
                 dialogs,
                 dialogText,
@@ -55,8 +62,12 @@ public class SnegurAndSkameika extends AppCompatActivity {
                 "Снегурочка",
                 "Скамья примирения",
                 null,
-                () -> startActivity(new Intent(this, SnegurAndLove.class)),
+                onDialogsComplete, // Используем callback для завершения
                 null
         );
+
+        backButton.setOnClickListener(v -> {
+            finish();
+        });
     }
 }

@@ -24,14 +24,19 @@ public class SnegurDialogActivity extends AppCompatActivity {
         FrameLayout dialogBox = findViewById(R.id.dialogBox);
         Button fullScreenButton = findViewById(R.id.fullScreenButton);
         MaterialButton nextButton = findViewById(R.id.nextButton);
-
-        MaterialButton playButton = null; // если ее нет на экране активити
-        // playButton = findViewById(R.id.playButton); // если есть
-
         MaterialButton backButton = findViewById(R.id.backButton);
 
         String[] dialogs = {
                 "Рассказчик: Снегурочка стояла у \"сковородки\", переминаясь с ноги на ногу. \"Где же дедушка?\" - волновалась она. Решив начать поиски, она отправилась к ювелиру."
+        };
+
+        // Создаем callback для завершения диалогов
+        Runnable onDialogsComplete = () -> {
+            // Возвращаемся в MainActivity с флагом перехода к следующей точке
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("move_to_next", true);
+            setResult(RESULT_OK, resultIntent);
+            finish();
         };
 
         DialogManager dialogManager = new DialogManager(
@@ -42,12 +47,17 @@ public class SnegurDialogActivity extends AppCompatActivity {
                 dialogBox,
                 fullScreenButton,
                 nextButton,
-                playButton,
+                null, // playButton
                 "Рассказчик",
                 "",
                 null,
-                () -> startActivity(new Intent(this, SnegurAndJeweler.class)),
+                onDialogsComplete, // Используем наш callback вместо прямого перехода
                 null
         );
+
+        // Обработчик кнопки назад
+        backButton.setOnClickListener(v -> {
+            finish();
+        });
     }
-} 
+}

@@ -39,6 +39,13 @@ public class SnegurAndDog extends AppCompatActivity {
                 "Пес-спасатель: — Гав! Удачи в поисках!"
         };
 
+        Runnable onDialogsComplete = () -> {
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("move_to_next", true);
+            setResult(RESULT_OK, resultIntent);
+            finish();
+        };
+
         DialogManager dialogManager = new DialogManager(
                 dialogs,
                 dialogText,
@@ -51,8 +58,12 @@ public class SnegurAndDog extends AppCompatActivity {
                 "Снегурочка",
                 "Пес-спасатель",
                 null,
-                () -> startActivity(new Intent(this, SnegurAndGolub.class)),
+                onDialogsComplete, // Используем callback для завершения
                 null
         );
+
+        backButton.setOnClickListener(v -> {
+            finish();
+        });
     }
 }

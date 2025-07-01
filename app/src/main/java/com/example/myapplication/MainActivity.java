@@ -1,223 +1,407 @@
 package com.example.myapplication;
 
+import android.os.Handler;
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.Button;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
-import android.Manifest;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationManager;
-import android.os.Bundle;
-import android.os.Looper;
-import android.provider.Settings;
-import android.util.Log;
-import android.widget.Toast;
-
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.yandex.mapkit.Animation;
 import com.yandex.mapkit.MapKitFactory;
+import com.yandex.mapkit.RequestPoint;
+import com.yandex.mapkit.RequestPointType;
+import com.yandex.mapkit.directions.DirectionsFactory;
+import com.yandex.mapkit.directions.driving.DrivingRoute;
+import com.yandex.mapkit.directions.driving.DrivingRouter;
+import com.yandex.mapkit.directions.driving.DrivingRouterType;
+import com.yandex.mapkit.directions.driving.DrivingSession;
+import com.yandex.mapkit.directions.driving.VehicleOptions;
 import com.yandex.mapkit.geometry.Point;
+import com.yandex.mapkit.layers.ObjectEvent;
 import com.yandex.mapkit.map.CameraPosition;
+import com.yandex.mapkit.map.IconStyle;
 import com.yandex.mapkit.map.MapObjectCollection;
 import com.yandex.mapkit.map.PlacemarkMapObject;
+import com.yandex.mapkit.map.PolylineMapObject;
 import com.yandex.mapkit.mapview.MapView;
+import com.yandex.mapkit.user_location.UserLocationLayer;
+import com.yandex.mapkit.user_location.UserLocationObjectListener;
+import com.yandex.mapkit.user_location.UserLocationView;
+import com.yandex.runtime.Error;
 import com.yandex.runtime.image.ImageProvider;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "LocationApp";
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
-    private static final int LOCATION_SETTINGS_REQUEST_CODE = 1002;
+    private static final String TAG = "SculptureRoute";
+    private static final int PERMISSION_REQUEST_CODE = 1;
+    private static final double ARRIVAL_DISTANCE_METERS = 50;
+    private static final int SCULPTURE_ACTIVITY_REQUEST = 1;
+
 
     private MapView mapView;
-    private FusedLocationProviderClient fusedLocationClient;
-    private LocationRequest locationRequest;
-    private LocationCallback locationCallback;
-    private PlacemarkMapObject userLocationMarker;
-    private boolean isRequestingLocationUpdates = false;
+    private UserLocationLayer userLocationLayer;
+    private MapObjectCollection mapObjects;
+    private DrivingRouter drivingRouter;
+    private DrivingSession drivingSession;
+    private Point[] sculpturePoints = {
+            new Point(57.767370, 40.927227), // 1. Снегурочка
+            new Point(57.766160, 40.929899), // 2. Ювелир
+            new Point(57.761988, 40.928879), // 3. (Заготовка)
+            new Point(57.761670, 40.928958), // 4. (Заготовка)
+            new Point(57.761414, 40.929754), // 5. (Заготовка)
+            new Point(57.763802, 40.924201), // 6. (Заготовка)
+            new Point(57.767449, 40.925813), // 7. (Заготовка)
+            new Point(57.767868, 40.926894), // 8. (Заготовка)
+            new Point(57.768041, 40.926923), // 9. (Заготовка)
+            new Point(57.770166, 40.931635)  // 10. (Заготовка)
+    };
+    private int currentSculptureIndex = 0;
+    private Point lastKnownUserLocation;
+    private boolean isNearSculpture = false;
+
+    private final UserLocationObjectListener userLocationObjectListener =
+            new UserLocationObjectListener() {
+                @Override
+                public void onObjectAdded(@NonNull UserLocationView userLocationView) {
+                    lastKnownUserLocation = userLocationView.getArrow().getGeometry();
+                    checkUserPosition();
+                    updateMap();
+                }
+
+                @Override
+                public void onObjectRemoved(@NonNull UserLocationView userLocationView) {}
+
+                @Override
+                public void onObjectUpdated(@NonNull UserLocationView userLocationView,
+                                            @NonNull ObjectEvent objectEvent) {
+                    lastKnownUserLocation = userLocationView.getArrow().getGeometry();
+                    checkUserPosition();
+                    updateMap();
+                }
+            };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        MapKitFactory.setApiKey("78126b39-de8b-48e2-bee9-61283bc89a6d");
-        MapKitFactory.initialize(this);
+        try {
+            MapKitFactory.setApiKey("78126b39-de8b-48e2-bee9-61283bc89a6d");
+            MapKitFactory.initialize(this);
+            DirectionsFactory.initialize(this);
 
-        setContentView(R.layout.activity_main);
+            setContentView(R.layout.activity_main);
 
-        mapView = findViewById(R.id.mapview);
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+            mapView = findViewById(R.id.map_view);
+            Button nextButton = findViewById(R.id.next_point_button);
+            Button skipButton = findViewById(R.id.skip_button);
+            mapObjects = mapView.getMap().getMapObjects().addCollection();
+            drivingRouter = DirectionsFactory.getInstance().createDrivingRouter(DrivingRouterType.COMBINED);
 
-        createLocationRequest();
-        createLocationCallback();
-
-
-        checkLocationPermissionsAndSettings();
-    }
-
-    private void createLocationRequest() {
-        locationRequest = LocationRequest.create();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(5000);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-    }
-
-    private void createLocationCallback() {
-        locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null) {
-                    Log.d(TAG, "Location result is null");
-                    return;
+            nextButton.setOnClickListener(v -> {
+                if (isNearSculpture) {
+                    openSculptureActivity();
+                } else {
+                    Toast.makeText(this, "Подойдите ближе к скульптуре", Toast.LENGTH_SHORT).show();
                 }
-                for (Location location : locationResult.getLocations()) {
-                    updateLocationOnMap(location);
+            });
+
+            skipButton.setOnClickListener(v -> {
+                if (currentSculptureIndex >= 0 && currentSculptureIndex < sculpturePoints.length) {
+                    // Сначала открываем Activity текущей скульптуры
+                    openSculptureActivity();
+
+                    // После возврата из Activity переходим к следующей точке
+                    new Handler().postDelayed(() -> {
+                        if (currentSculptureIndex < sculpturePoints.length - 1) {
+                            currentSculptureIndex++;
+                            isNearSculpture = false;
+                            updateMap();
+                        }
+                    }, 100); // Небольшая задержка для гарантии завершения анимации
                 }
+            });
+
+            if (checkLocationPermission()) {
+                initUserLocation();
             }
-        };
-    }
 
-    private void checkLocationPermissionsAndSettings() {
-        if (checkLocationPermissions()) {
-            checkLocationSettings();
+        } catch (Exception e) {
+            Log.e(TAG, "Ошибка инициализации", e);
+            Toast.makeText(this, "Ошибка инициализации карты", Toast.LENGTH_LONG).show();
+            finish();
         }
     }
 
-    private boolean checkLocationPermissions() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    LOCATION_PERMISSION_REQUEST_CODE);
-            return false;
-        }
-    }
-
-    private void checkLocationSettings() {
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        boolean isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-        if (isGpsEnabled || isNetworkEnabled) {
-            startLocationUpdates();
-        } else {
-            showEnableLocationDialog();
-        }
-    }
-
-    private void showEnableLocationDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("Требуется геолокация")
-                .setMessage("Для работы приложения необходимо включить геолокацию")
-                .setPositiveButton("Настройки", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        startActivityForResult(intent, LOCATION_SETTINGS_REQUEST_CODE);
-                    }
-                })
-                .setNegativeButton("Отмена", null)
-                .create()
-                .show();
-    }
-
-    private void startLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
+    private void checkUserPosition() {
+        if (lastKnownUserLocation == null || currentSculptureIndex < 0 ||
+                currentSculptureIndex >= sculpturePoints.length) {
             return;
         }
 
+        Point sculpturePoint = sculpturePoints[currentSculptureIndex];
+        if (sculpturePoint.getLatitude() == 0 && sculpturePoint.getLongitude() == 0) {
+            return;
+        }
+
+        double distance = calculateDistance(lastKnownUserLocation, sculpturePoint);
+        isNearSculpture = distance <= ARRIVAL_DISTANCE_METERS;
+
+        if (isNearSculpture) {
+            runOnUiThread(() ->
+                    Toast.makeText(this, "Вы у цели! Нажмите 'Следующая точка'", Toast.LENGTH_SHORT).show());
+        }
+    }
+    private boolean checkLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSION_REQUEST_CODE);
+            return false;
+        }
+        return true;
+    }
+
+    private void initUserLocation() {
         try {
-            fusedLocationClient.requestLocationUpdates(locationRequest,
-                    locationCallback,
-                    Looper.getMainLooper());
+            userLocationLayer = MapKitFactory.getInstance()
+                    .createUserLocationLayer(mapView.getMapWindow());
+            userLocationLayer.setVisible(true);
+            userLocationLayer.setHeadingEnabled(true);
+            userLocationLayer.setObjectListener(userLocationObjectListener);
 
-            isRequestingLocationUpdates = true;
-
-
-            fusedLocationClient.getLastLocation()
-                    .addOnCompleteListener(new OnCompleteListener<Location>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Location> task) {
-                            if (task.isSuccessful() && task.getResult() != null) {
-                                updateLocationOnMap(task.getResult());
-                            } else {
-                                Log.e(TAG, "Failed to get last location: " +
-                                        (task.getException() != null ?
-                                                task.getException().getMessage() : "unknown error"));
-                                Toast.makeText(MainActivity.this,
-                                        "Определение местоположения...",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
         } catch (Exception e) {
-            Log.e(TAG, "Location request error: " + e.getMessage());
-            Toast.makeText(this, "Ошибка получения местоположения", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Ошибка инициализации геолокации", e);
+            Toast.makeText(this, "Ошибка инициализации геолокации", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void stopLocationUpdates() {
-        if (isRequestingLocationUpdates && locationCallback != null) {
-            fusedLocationClient.removeLocationUpdates(locationCallback);
-            isRequestingLocationUpdates = false;
+    private void updateMapWithUserPosition() {
+        runOnUiThread(() -> {
+            try {
+                if (lastKnownUserLocation == null) return;
+
+                // Очищаем только пользовательские метки (можно реализовать более точную очистку)
+                mapObjects.clear();
+
+                // Добавляем метку пользователя
+                PlacemarkMapObject userMarker = mapObjects.addPlacemark(
+                        lastKnownUserLocation,
+                        ImageProvider.fromResource(this, R.drawable.ic_user_location));
+                userMarker.setIconStyle(new IconStyle().setScale(1.2f));
+
+                // Показываем текущую скульптуру
+                showCurrentSculpture();
+
+            } catch (Exception e) {
+                Log.e(TAG, "Ошибка обновления карты", e);
+            }
+        });
+    }
+
+    private double calculateDistance(Point p1, Point p2) {
+        final int R = 6371; // Радиус Земли в км
+        double latDistance = Math.toRadians(p2.getLatitude() - p1.getLatitude());
+        double lonDistance = Math.toRadians(p2.getLongitude() - p1.getLongitude());
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(p1.getLatitude())) * Math.cos(Math.toRadians(p2.getLatitude()))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c * 1000; // Расстояние в метрах
+    }
+
+
+    private void openSculptureActivity() {
+        // Очищаем карту перед переходом
+        mapObjects.clear();
+
+        // Определяем какое Activity открывать
+        Class<?> activityClass;
+        switch (currentSculptureIndex) {
+            case 0:
+                activityClass = SnegurDialogActivity.class;
+                break;
+            case 1:
+                activityClass = SnegurAndJeweler.class;
+                break;
+            case 2:
+                activityClass = SnegurAndSkameika.class;
+                break;
+            case 3:
+                activityClass = SnegurAndLove.class;
+                break;
+            case 4:
+                activityClass = SnegurAndLadia.class;
+                break;
+            case 5:
+                activityClass = SnegurAndVodoprovod.class;
+                break;
+            case 6:
+                activityClass = SnegurAndCat.class;
+                break;
+            case 7:
+                activityClass = SnegurAndDog.class;
+                break;
+            case 8:
+                activityClass = SnegurAndGolub.class;
+                break;
+            case 9:
+                activityClass = SnegurAndOstrovski.class;
+                break;
+            default:
+                activityClass = StartActivity.class;
+        }
+
+        // Запускаем Activity с ожиданием результата
+        Intent intent = new Intent(this, activityClass);
+        startActivityForResult(intent, currentSculptureIndex);
+    }
+
+    private void updateMap() {
+        runOnUiThread(() -> {
+            try {
+                mapObjects.clear();
+
+                if (lastKnownUserLocation != null) {
+                    PlacemarkMapObject userMarker = mapObjects.addPlacemark(
+                            lastKnownUserLocation,
+                            ImageProvider.fromResource(this, R.drawable.ic_user_location));
+                    userMarker.setIconStyle(new IconStyle().setScale(1.2f));
+                }
+
+                showCurrentSculpture();
+
+            } catch (Exception e) {
+                Log.e(TAG, "Ошибка обновления карты", e);
+            }
+        });
+    }
+
+    private void showCurrentSculpture() {
+        try {
+            // Проверка индекса скульптуры
+            if (currentSculptureIndex < 0 || currentSculptureIndex >= sculpturePoints.length) {
+                Log.e(TAG, "Неверный индекс скульптуры");
+                return;
+            }
+
+            Point sculpturePoint = sculpturePoints[currentSculptureIndex];
+            if (sculpturePoint.getLatitude() == 0 && sculpturePoint.getLongitude() == 0) {
+                Log.e(TAG, "Координаты скульптуры не заданы");
+                return;
+            }
+
+            // Добавление метки скульптуры
+            PlacemarkMapObject sculptureMarker = mapObjects.addPlacemark(
+                    sculpturePoint,
+                    ImageProvider.fromResource(this, R.drawable.ic_sculpture_normal));
+            sculptureMarker.setIconStyle(new IconStyle().setScale(1.5f));
+
+            // Построение маршрута, если есть позиция пользователя
+            if (lastKnownUserLocation != null) {
+                buildRoute(lastKnownUserLocation, sculpturePoint);
+            }
+
+            // Центрирование карты
+            mapView.getMap().move(
+                    new CameraPosition(
+                            sculpturePoint,
+                            14f,
+                            0f,
+                            30f));
+
+        } catch (Exception e) {
+            Log.e(TAG, "Ошибка отображения скульптуры", e);
+            Toast.makeText(this, "Ошибка отображения скульптуры", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void updateLocationOnMap(Location location) {
-        if (location == null) return;
-
-        Point currentPoint = new Point(location.getLatitude(), location.getLongitude());
-        MapObjectCollection mapObjects = mapView.getMap().getMapObjects();
-
-
-        if (userLocationMarker != null) {
-            mapObjects.remove(userLocationMarker);
+    private void buildRoute(Point from, Point to) {
+        if (drivingSession != null) {
+            drivingSession.cancel();
         }
 
+        List<RequestPoint> points = new ArrayList<>();
+        points.add(new RequestPoint(from, RequestPointType.WAYPOINT, null, null));
+        points.add(new RequestPoint(to, RequestPointType.WAYPOINT, null, null));
 
-        userLocationMarker = mapObjects.addPlacemark(currentPoint,
-                ImageProvider.fromResource(this, R.drawable.ic_user_location));
+        com.yandex.mapkit.directions.driving.DrivingOptions options =
+                new com.yandex.mapkit.directions.driving.DrivingOptions();
+        options.setRoutesCount(1);
+        options.setAvoidTolls(true);
 
+        drivingSession = drivingRouter.requestRoutes(
+                points,
+                options,
+                new VehicleOptions(),
+                new DrivingSession.DrivingRouteListener() {
+                    @Override
+                    public void onDrivingRoutes(@NonNull List<DrivingRoute> routes) {
+                        if (!routes.isEmpty()) {
+                            runOnUiThread(() -> {
+                                PolylineMapObject route = mapObjects.addPolyline(routes.get(0).getGeometry());
+                                route.setStrokeColor(Color.BLUE);
+                                route.setStrokeWidth(5f);
+                            });
+                        } else {
+                            Log.e(TAG, "Маршруты не найдены");
+                        }
+                    }
 
-        mapView.getMap().move(
-                new CameraPosition(currentPoint, 15.0f, 0.0f, 0.0f),
-                new Animation(Animation.Type.SMOOTH, 1),
-                null);
+                    @Override
+                    public void onDrivingRoutesError(@NonNull Error error) {
+                        Log.e(TAG, "Ошибка маршрута: " + error);
+                        runOnUiThread(() ->
+                                Toast.makeText(MainActivity.this,
+                                        "Ошибка построения маршрута",
+                                        Toast.LENGTH_LONG).show());
+                    }
+                });
+    }
+
+    private void showNextSculpture() {
+        if (currentSculptureIndex < sculpturePoints.length - 1) {
+            currentSculptureIndex++;
+            showCurrentSculpture();
+            Toast.makeText(this, "Идите к скульптуре " + (currentSculptureIndex + 1),
+                    Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Поздравляем! Вы прошли весь маршрут!", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                checkLocationSettings();
-            } else {
-                Toast.makeText(this,
-                        "Разрешение на доступ к местоположению отклонено",
-                        Toast.LENGTH_LONG).show();
-            }
+        if (requestCode == PERMISSION_REQUEST_CODE &&
+                grantResults.length > 0 &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            initUserLocation();
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == LOCATION_SETTINGS_REQUEST_CODE) {
-            checkLocationSettings();
+
+        if (requestCode == SCULPTURE_ACTIVITY_REQUEST && resultCode == RESULT_OK) {
+            if (data != null && data.getBooleanExtra("move_to_next", false)) {
+                // Переходим к следующей точке только если диалоги завершены
+                if (currentSculptureIndex < sculpturePoints.length - 1) {
+                    currentSculptureIndex++;
+                    isNearSculpture = false;
+                    updateMap();
+                }
+            }
         }
     }
 
@@ -229,29 +413,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (!isRequestingLocationUpdates) {
-            checkLocationPermissionsAndSettings();
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        stopLocationUpdates();
-    }
-
-    @Override
     protected void onStop() {
+        if (drivingSession != null) {
+            drivingSession.cancel();
+        }
         mapView.onStop();
         MapKitFactory.getInstance().onStop();
         super.onStop();
     }
-
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        stopLocationUpdates();
+    protected void onResume() {
+        super.onResume();
+        // При возврате из Activity переходим к следующей точке
+        if (isNearSculpture && currentSculptureIndex < sculpturePoints.length - 1) {
+            currentSculptureIndex++;
+            isNearSculpture = false;
+            updateMap();
+        }
     }
 }
