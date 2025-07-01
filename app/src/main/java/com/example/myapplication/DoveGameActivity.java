@@ -1,40 +1,92 @@
 package com.example.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class DoveGameActivity extends AppCompatActivity {
     private ImageView dove;
-    private TextView titleText, nextText;
+    private TextView titleText;
+    private LinearLayout buttonContainer;
+    private Button playAgainButton;
+    private Button nextSculptureButton;
+    private TextView nextText;
+
     private int dovePosition = 0;
     private int maxHeight;
-    private boolean isFlying = false;
+    private boolean isGameCompleted = false;
     private Handler handler = new Handler();
+    private Runnable flyRunnable;
     private Runnable fallRunnable;
+
+    private int requiredTaps = 5;
+    private int currentTaps = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dove_game);
 
+        // Инициализация View элементов
         dove = findViewById(R.id.dove);
         titleText = findViewById(R.id.titleText);
         nextText = findViewById(R.id.nextText);
+        buttonContainer = findViewById(R.id.buttonContainer);
+        playAgainButton = findViewById(R.id.restartButton);
+        nextSculptureButton = findViewById(R.id.nextSculptureButton);
 
-        // Получаем максимальную высоту экрана
+        buttonContainer.setVisibility(View.GONE);
+        nextText.setVisibility(View.VISIBLE);
+        nextText.setText("Нажмите на голубя " + requiredTaps + " раз");
+
         dove.post(() -> {
             maxHeight = titleText.getBottom() - dove.getHeight();
         });
 
         // Обработчик нажатия на голубя
         dove.setOnClickListener(v -> {
-            if (!isFlying) {
-                isFlying = true;
-                flyUp();
+            if (!isGameCompleted) {
+                currentTaps++;
+                nextText.setText("Нажатий: " + currentTaps + " из " + requiredTaps);
+
+                // Удаляем предыдущие анимации
+                handler.removeCallbacks(flyRunnable);
+                handler.removeCallbacks(fallRunnable);
+
+                // Запускаем новую анимацию полета
+                flyRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        dovePosition += maxHeight / (requiredTaps * 3);
+                        dove.setTranslationY(-dovePosition);
+
+                        if (dovePosition >= maxHeight && currentTaps >= requiredTaps) {
+                            completeGame();
+                            return;
+                        }
+
+                        if (dovePosition < maxHeight) {
+                            handler.postDelayed(this, 50);
+                        } else {
+                            startFalling();
+                        }
+                    }
+                };
+
+                handler.post(flyRunnable);
+
+                // Запланировать падение через 1 секунду бездействия
+                handler.postDelayed(() -> {
+                    if (!isGameCompleted && dovePosition > 0) {
+                        startFalling();
+                    }
+                }, 1000);
             }
         });
 
@@ -42,39 +94,51 @@ public class DoveGameActivity extends AppCompatActivity {
         fallRunnable = new Runnable() {
             @Override
             public void run() {
-                if (dovePosition > 0) {
-                    dovePosition -= 20;
+                if (dovePosition > 0 && !isGameCompleted) {
+                    dovePosition -= 10;
                     dove.setTranslationY(-dovePosition);
                     handler.postDelayed(this, 50);
-                } else {
-                    isFlying = false;
                 }
             }
         };
+
+        playAgainButton.setOnClickListener(v -> resetGame());
+        nextSculptureButton.setOnClickListener(v -> {
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("move_to_next", true);
+            setResult(RESULT_OK, resultIntent);
+            finish();
+        });
     }
 
-    private void flyUp() {
-        dovePosition += 40;
-        dove.setTranslationY(-dovePosition);
+    private void startFalling() {
+        handler.removeCallbacks(flyRunnable);
+        handler.post(fallRunnable);
+    }
 
-        if (dovePosition >= maxHeight) {
-            titleText.setText("Спасибо");
-            nextText.setVisibility(View.VISIBLE);
-            nextText.setText("Далее");
-            return;
-        }
+    private void completeGame() {
+        isGameCompleted = true;
+        titleText.setText("Победа!");
+        nextText.setText("Голубь взлетел!");
+        buttonContainer.setVisibility(View.VISIBLE);
+        handler.removeCallbacks(flyRunnable);
+        handler.removeCallbacks(fallRunnable);
+    }
 
-        handler.postDelayed(() -> {
-            if (dovePosition < maxHeight) {
-                flyUp();
-            }
-        }, 50);
+    private void resetGame() {
+        isGameCompleted = false;
+        dovePosition = 0;
+        currentTaps = 0;
+        dove.setTranslationY(0);
+        titleText.setText("Помогите голубю взлететь");
+        nextText.setText("Нажмите на голубя " + requiredTaps + " раз");
+        buttonContainer.setVisibility(View.GONE);
+        handler.removeCallbacksAndMessages(null);
+    }
 
-        // Начинаем падение, если не было нажатия в течение 1 секунды
-        handler.postDelayed(() -> {
-            if (isFlying && dovePosition < maxHeight) {
-                handler.post(fallRunnable);
-            }
-        }, 1000);
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        handler.removeCallbacksAndMessages(null);
     }
 }
