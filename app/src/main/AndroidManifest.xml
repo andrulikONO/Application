@@ -54,6 +54,7 @@
             android:name=".SnegurAndCat"
             android:exported="true"
             android:screenOrientation="portrait" />
+        <activity android:name=".KotGameActivity" />
         <activity
             android:name=".SnegurAndGolub"
             android:exported="true"
@@ -70,6 +71,7 @@
             android:name=".SnegurAndLadia"
             android:exported="true"
             android:screenOrientation="portrait" />
+        <activity android:name=".RookGameActivity" />
         <activity
             android:name=".SnegurAndLove"
             android:exported="true"

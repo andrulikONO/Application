@@ -50,7 +50,7 @@ public class SnegurAndCat extends AppCompatActivity {
                 "Кот",
                 null,
                 () -> startActivity(new Intent(this, SnegurAndDog.class)),
-                null  // // TODO сделать навигацию на игру, когда ее сделают вообще
+                () -> startActivity(new Intent(this, KotGameActivity.class))  // // TODO сделать навигацию на игру, когда ее сделают вообще
         );
 
     }

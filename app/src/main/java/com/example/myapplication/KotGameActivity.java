@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
@@ -423,7 +424,7 @@ public class KotGameActivity extends AppCompatActivity {
                 .setTitle("Поздравляем!")
                 .setMessage("Вы успешно собрали 30 объектов!")
                 .setPositiveButton("Новая игра", (dialog, which) -> restartGame())
-                .setNegativeButton("Вернуться", (dialog, which) -> finish())
+                .setNegativeButton("Вернуться", (dialog, which) -> startActivity(new Intent(this, SnegurAndCat.class)))
                 .setCancelable(false)
                 .show();
     }

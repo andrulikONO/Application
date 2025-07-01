@@ -49,7 +49,7 @@ public class SnegurAndLadia extends AppCompatActivity {
                 "Ладья",
                 null,
                 () -> startActivity(new Intent(this, SnegurAndVodoprovod.class)),
-                null // TODO сделать навигацию на игру, когда ее сделают вообще
+                () -> startActivity(new Intent(this, RookGameActivity.class)) // TODO сделать навигацию на игру, когда ее сделают вообще
         );
     }
 }

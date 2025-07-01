@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
@@ -113,7 +114,7 @@ public class RookGameActivity extends AppCompatActivity{
                 .setTitle("Победа!")
                 .setMessage("Вы набрали 30 очков!\nВы успешно завершили уровень и можете идти дальше.")
                 .setPositiveButton("Новая игра", (dialog, which) -> restartGame())
-                .setNegativeButton("Вернуться", (dialog, which) -> finish())
+                .setNegativeButton("Вернуться", (dialog, which)-> startActivity(new Intent(this, SnegurAndLadia.class)))
                 .setCancelable(false)
                 .setOnDismissListener(dialog -> {
                     if (!gameWon) {
