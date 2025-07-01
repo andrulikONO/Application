@@ -24,7 +24,7 @@
 
         <!-- SnegurAndVodoprovod БЫЛ ПОСТАВЛЕН ДЛЯ ТЕСТА, ЕСЛИ НУЖНО ПОТЕСТИТЬ: ПОДСТАВЬТЕ СВОЙ -->
         <activity
-            android:name=".SnegurAndVodoprovod"
+            android:name=".StartActivity"
             android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -74,6 +74,10 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".SnegurAndSkameika"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SnegurAndVodoprovod"
             android:exported="true"
             android:screenOrientation="portrait" />
 

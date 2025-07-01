@@ -16,7 +16,7 @@ public class StartActivity extends AppCompatActivity {
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(StartActivity.this, StartDialogActivity.class);
+                Intent intent = new Intent(StartActivity.this, SnegurDialogActivity.class);
                 startActivity(intent);
             }
         });
