@@ -61,7 +61,7 @@ public class SnegurAndJeweler extends AppCompatActivity {
                 "Ювелир",
                 null,
                 onDialogsComplete, // Используем callback для завершения
-                null
+                () -> startActivity(new Intent(this, SnegurAndJeweler.class))
         );
 
         backButton.setOnClickListener(v -> {
