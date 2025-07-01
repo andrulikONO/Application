@@ -43,4 +43,32 @@
         android:textStyle="bold"
         android:visibility="gone" />
 
+    <!-- Контейнер для кнопок -->
+    <LinearLayout
+        android:id="@+id/buttonContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/restartButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Начать снова"
+            android:layout_marginBottom="20dp"
+            android:padding="16dp"
+            android:textSize="18sp"/>
+
+        <Button
+            android:id="@+id/nextSculptureButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Следующая скульптура"
+            android:padding="16dp"
+            android:textSize="18sp"/>
+    </LinearLayout>
+
 </RelativeLayout>
