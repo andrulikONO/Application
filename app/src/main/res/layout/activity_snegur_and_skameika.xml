@@ -107,7 +107,7 @@
     <FrameLayout
         android:id="@+id/dialogBox"
         android:layout_width="0dp"
-        android:layout_height="230dp"
+        android:layout_height="285dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="24dp"
@@ -129,7 +129,7 @@
             android:textStyle="bold"
             android:fontFamily="sans-serif-black"
             android:lineSpacingExtra="4sp"
-            android:maxLines="7"
+            android:maxLines="9"
             android:ellipsize="end"/>
     </FrameLayout>
 
