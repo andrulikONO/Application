@@ -59,7 +59,7 @@ public class SnegurAndGolub extends AppCompatActivity {
                 "Голубь",
                 null,
                 onDialogsComplete, // Используем callback для завершения
-                null
+                () -> startActivity(new Intent(this, DoveGameActivity.class))
         );
 
         backButton.setOnClickListener(v -> {

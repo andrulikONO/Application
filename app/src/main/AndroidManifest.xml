@@ -86,6 +86,7 @@
             android:screenOrientation="portrait" />
 
         <activity android:name=".DoveGameActivity" />
+        <activity android:name=".PuzzleGameActivity"/>
 
 
     </application>

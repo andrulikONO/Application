@@ -212,7 +212,7 @@ public class PuzzleGameActivity extends AppCompatActivity{
                 .setTitle("Пазл собран!")
                 .setMessage("Хотите сыграть еще раз?")
                 .setPositiveButton("Рестарт", (dialog, which) -> restartGame())
-                .setNegativeButton("Выход",  (dialog, which) -> startActivity(new Intent(this, SnegurAndJeweler.class)))
+                .setNegativeButton("Выход",  (dialog, which) -> finish())
                 .setCancelable(false)
                 .show();
     }

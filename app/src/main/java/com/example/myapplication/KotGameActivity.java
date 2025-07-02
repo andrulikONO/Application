@@ -424,7 +424,7 @@ public class KotGameActivity extends AppCompatActivity {
                 .setTitle("Поздравляем!")
                 .setMessage("Вы успешно собрали 30 объектов!")
                 .setPositiveButton("Новая игра", (dialog, which) -> restartGame())
-                .setNegativeButton("Вернуться", (dialog, which) -> startActivity(new Intent(this, SnegurAndCat.class)))
+                .setNegativeButton("Вернуться", (dialog, which) -> finish())
                 .setCancelable(false)
                 .show();
     }
