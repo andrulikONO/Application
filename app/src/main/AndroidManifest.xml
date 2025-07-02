@@ -88,6 +88,8 @@
         <activity android:name=".DoveGameActivity" />
         <activity android:name=".PuzzleGameActivity"/>
         <activity android:name=".PrologActivity" />
+        <activity android:name=".CongratulationsActivity"
+            android:exported="true"/>
 
 
     </application>

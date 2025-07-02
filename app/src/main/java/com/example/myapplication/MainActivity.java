@@ -53,14 +53,14 @@ public class MainActivity extends AppCompatActivity {
     private Point[] sculpturePoints = {
             new Point(57.767370, 40.927227), // 1. Снегурочка
             new Point(57.766160, 40.929899), // 2. Ювелир
-            new Point(57.761988, 40.928879), // 3. (Заготовка)
-            new Point(57.761670, 40.928958), // 4. (Заготовка)
-            new Point(57.761414, 40.929754), // 5. (Заготовка)
-            new Point(57.763802, 40.924201), // 6. (Заготовка)
-            new Point(57.767449, 40.925813), // 7. (Заготовка)
-            new Point(57.767868, 40.926894), // 8. (Заготовка)
-            new Point(57.768041, 40.926923), // 9. (Заготовка)
-            new Point(57.770166, 40.931635)  // 10. (Заготовка)
+            new Point(57.761988, 40.928879), // 3. (Скамья)
+            new Point(57.761670, 40.928958), // 4. (Любовь)
+            new Point(57.761414, 40.929754), // 5. (Ладья)
+            new Point(57.763802, 40.924201), // 6. (Водопроводчик)
+            new Point(57.767449, 40.925813), // 7. (Кот)
+            new Point(57.767868, 40.926894), // 8. (Собака)
+            new Point(57.768041, 40.926923), // 9. (Голубь)
+            new Point(57.770166, 40.931635)  // 10. (Островский)
     };
     private int currentSculptureIndex = 0;
     private Point lastKnownUserLocation;
@@ -221,7 +221,6 @@ public class MainActivity extends AppCompatActivity {
     private void openSculptureActivity() {
         // Очищаем карту перед переходом
         mapObjects.clear();
-
         // Определяем какое Activity открывать
         Class<?> activityClass;
         switch (currentSculptureIndex) {
@@ -258,7 +257,6 @@ public class MainActivity extends AppCompatActivity {
             default:
                 activityClass = StartActivity.class;
         }
-
         // Запускаем Activity с ожиданием результата
         Intent intent = new Intent(this, activityClass);
         startActivityForResult(intent, currentSculptureIndex);
