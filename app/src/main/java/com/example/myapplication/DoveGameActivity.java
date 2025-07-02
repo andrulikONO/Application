@@ -27,6 +27,7 @@ public class DoveGameActivity extends AppCompatActivity {
 
     private int requiredTaps = 5;
     private int currentTaps = 0;
+    private int tapProgress = 0; // Прогресс от каждого нажатия
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,13 +47,14 @@ public class DoveGameActivity extends AppCompatActivity {
         nextText.setText("Нажмите на голубя " + requiredTaps + " раз");
 
         dove.post(() -> {
-            maxHeight = titleText.getBottom() - dove.getHeight();
+            maxHeight = (int)((titleText.getBottom() - dove.getHeight()) * 0.9); // 90% высоты
         });
 
         // Обработчик нажатия на голубя
         dove.setOnClickListener(v -> {
             if (!isGameCompleted) {
                 currentTaps++;
+                tapProgress += maxHeight / requiredTaps; // Каждое нажатие добавляет часть высоты
                 nextText.setText("Нажатий: " + currentTaps + " из " + requiredTaps);
 
                 // Удаляем предыдущие анимации
@@ -63,16 +65,12 @@ public class DoveGameActivity extends AppCompatActivity {
                 flyRunnable = new Runnable() {
                     @Override
                     public void run() {
-                        dovePosition += maxHeight / (requiredTaps * 3);
-                        dove.setTranslationY(-dovePosition);
-
-                        if (dovePosition >= maxHeight && currentTaps >= requiredTaps) {
+                        if (dovePosition < tapProgress) {
+                            dovePosition += 15; // Плавное увеличение позиции
+                            dove.setTranslationY(-dovePosition);
+                            handler.postDelayed(this, 30);
+                        } else if (currentTaps >= requiredTaps) {
                             completeGame();
-                            return;
-                        }
-
-                        if (dovePosition < maxHeight) {
-                            handler.postDelayed(this, 50);
                         } else {
                             startFalling();
                         }
@@ -95,9 +93,9 @@ public class DoveGameActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if (dovePosition > 0 && !isGameCompleted) {
-                    dovePosition -= 10;
+                    dovePosition = Math.max(0, dovePosition - 8); // Плавное падение
                     dove.setTranslationY(-dovePosition);
-                    handler.postDelayed(this, 50);
+                    handler.postDelayed(this, 30);
                 }
             }
         };
@@ -123,12 +121,26 @@ public class DoveGameActivity extends AppCompatActivity {
         buttonContainer.setVisibility(View.VISIBLE);
         handler.removeCallbacks(flyRunnable);
         handler.removeCallbacks(fallRunnable);
+
+        // Анимация полного взлета
+        flyRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (dovePosition < maxHeight) {
+                    dovePosition += 20;
+                    dove.setTranslationY(-dovePosition);
+                    handler.postDelayed(this, 30);
+                }
+            }
+        };
+        handler.post(flyRunnable);
     }
 
     private void resetGame() {
         isGameCompleted = false;
         dovePosition = 0;
         currentTaps = 0;
+        tapProgress = 0;
         dove.setTranslationY(0);
         titleText.setText("Помогите голубю взлететь");
         nextText.setText("Нажмите на голубя " + requiredTaps + " раз");
