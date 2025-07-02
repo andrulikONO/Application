@@ -11,12 +11,15 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
+import com.example.myapplication.DialogStateProvider;
 
 public class SnegurAndSkameika extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_snegur_and_skameika);
+
+        DialogStateProvider.getInstance().setCurrentDialogIndex(2);
 
         TextView dialogText = findViewById(R.id.dialogText);
         ImageView sngurochkaImage = findViewById(R.id.sngurochkaImage);
@@ -37,13 +40,14 @@ public class SnegurAndSkameika extends AppCompatActivity {
                 "Скамья примирения: — О, милое дитя, в нашем городе новости разносятся быстрее вороньих крыльев. Только что мирил двух купцов - те так ругались, что даже чайки с набережной разлетелись. Но даже в самой жаркой перепалке они успели упомянуть, что видели твоего дедушку.",
                 "Снегурочка: — Правда? Где же он?",
                 "Скамья примирения: — Как мне говорили, он торопился к каким-то темным буквам.",
-                "Снегурочка: — Наверное они говорили про надпись “Любовь”",
+                "Снегурочка: — Наверное они говорили про надпись Любовь",
                 "Скамья примирения: — Тогда тебе прямая дорога туда",
                 "Снегурочка: — Спасибо вам огромное! Вы так помогли",
                 "Скамья примирения: — Пустяки, Удачи в поисках! И помни - иногда чтобы найти, нужно сначала потеряться."
         };
 
         Runnable onDialogsComplete = () -> {
+            DialogStateProvider.getInstance().setDialogCompleted(true);
             Intent resultIntent = new Intent();
             resultIntent.putExtra("move_to_next", true);
             setResult(RESULT_OK, resultIntent);
@@ -67,6 +71,10 @@ public class SnegurAndSkameika extends AppCompatActivity {
         );
 
         backButton.setOnClickListener(v -> {
+            DialogStateProvider.getInstance().setDialogCompleted(false);
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("move_to_next", false);
+            setResult(RESULT_OK, resultIntent);
             finish();
         });
     }

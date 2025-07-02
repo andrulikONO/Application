@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -16,6 +17,8 @@ public class SnegurAndOstrovski extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_snegur_and_ostrovski);
+
+        DialogStateProvider.getInstance().setCurrentDialogIndex(9);
 
         TextView dialogText = findViewById(R.id.dialogText);
         ImageView sngurochkaImage = findViewById(R.id.sngurochkaImage);
@@ -53,5 +56,21 @@ public class SnegurAndOstrovski extends AppCompatActivity {
                 null,
                 null
         );
+
+        Runnable onDialogsComplete = () -> {
+            DialogStateProvider.getInstance().setDialogCompleted(true);
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("move_to_next", true);
+            setResult(RESULT_OK, resultIntent);
+            finish();
+        };
+
+        backButton.setOnClickListener(v -> {
+            DialogStateProvider.getInstance().setDialogCompleted(false);
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("move_to_next", false);
+            setResult(RESULT_OK, resultIntent);
+            finish();
+        });
     }
 }

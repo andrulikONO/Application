@@ -19,6 +19,8 @@ public class SnegurAndVodoprovod extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_snegur_and_vodoprovod);
 
+        DialogStateProvider.getInstance().setCurrentDialogIndex(5);
+
         TextView dialogText = findViewById(R.id.dialogText);
         ImageView sngurochkaImage = findViewById(R.id.sngurochkaImage);
         ImageView vodoprovodchikImage = findViewById(R.id.vodoprovodchikImage);
@@ -38,6 +40,7 @@ public class SnegurAndVodoprovod extends AppCompatActivity {
         };
 
         Runnable onDialogsComplete = () -> {
+            DialogStateProvider.getInstance().setDialogCompleted(true);
             Intent resultIntent = new Intent();
             resultIntent.putExtra("move_to_next", true);
             setResult(RESULT_OK, resultIntent);
@@ -61,6 +64,10 @@ public class SnegurAndVodoprovod extends AppCompatActivity {
         );
 
         backButton.setOnClickListener(v -> {
+            DialogStateProvider.getInstance().setDialogCompleted(false);
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("move_to_next", false);
+            setResult(RESULT_OK, resultIntent);
             finish();
         });
     }

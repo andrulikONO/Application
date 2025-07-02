@@ -13,10 +13,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.button.MaterialButton;
 
 public class SnegurDialogActivity extends AppCompatActivity {
+
+    DialogManager dialogManager;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_snegur_dialog);
+        DialogStateProvider.getInstance().setCurrentDialogIndex(0);
 
         TextView dialogText = findViewById(R.id.dialogText);
         ImageView sngurochkaImage = findViewById(R.id.sngurochkaImage);
@@ -32,14 +36,14 @@ public class SnegurDialogActivity extends AppCompatActivity {
 
         // Создаем callback для завершения диалогов
         Runnable onDialogsComplete = () -> {
-            // Возвращаемся в MainActivity с флагом перехода к следующей точке
+            DialogStateProvider.getInstance().setDialogCompleted(true);
             Intent resultIntent = new Intent();
             resultIntent.putExtra("move_to_next", true);
             setResult(RESULT_OK, resultIntent);
             finish();
         };
 
-        DialogManager dialogManager = new DialogManager(
+        dialogManager = new DialogManager(
                 dialogs,
                 dialogText,
                 sngurochkaImage,
@@ -55,8 +59,11 @@ public class SnegurDialogActivity extends AppCompatActivity {
                 null
         );
 
-        // Обработчик кнопки назад
         backButton.setOnClickListener(v -> {
+            DialogStateProvider.getInstance().setDialogCompleted(false);
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("move_to_next", false);
+            setResult(RESULT_OK, resultIntent);
             finish();
         });
     }

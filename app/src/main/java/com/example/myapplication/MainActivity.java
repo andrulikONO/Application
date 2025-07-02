@@ -37,6 +37,7 @@ import com.yandex.runtime.Error;
 import com.yandex.runtime.image.ImageProvider;
 import java.util.ArrayList;
 import java.util.List;
+import com.example.myapplication.DialogStateProvider;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "SculptureRoute";
@@ -114,23 +115,17 @@ public class MainActivity extends AppCompatActivity {
 
             skipButton.setOnClickListener(v -> {
                 if (currentSculptureIndex >= 0 && currentSculptureIndex < sculpturePoints.length) {
-                    // Сначала открываем Activity текущей скульптуры
+                    // просто открываем активити текущей скульптуры
+                    // переход к следующей точке будет происходить через onActivityResult
                     openSculptureActivity();
-
-                    // После возврата из Activity переходим к следующей точке
-                    new Handler().postDelayed(() -> {
-                        if (currentSculptureIndex < sculpturePoints.length - 1) {
-                            currentSculptureIndex++;
-                            isNearSculpture = false;
-                            updateMap();
-                        }
-                    }, 100); // Небольшая задержка для гарантии завершения анимации
                 }
             });
 
             if (checkLocationPermission()) {
                 initUserLocation();
             }
+
+            currentSculptureIndex = DialogStateProvider.getInstance().getCurrentDialogIndex();
 
         } catch (Exception e) {
             Log.e(TAG, "Ошибка инициализации", e);
@@ -219,10 +214,10 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void openSculptureActivity() {
-        // Очищаем карту перед переходом
-        mapObjects.clear();
 
-        // Определяем какое Activity открывать
+        // mapObjects.clear(); // ВОССТАНОВИТЕ ЕСЛИ ЧЕ ТО НЕ РАБОТАЕ С КАРТОЙ
+        DialogStateProvider.getInstance().setCurrentDialogIndex(currentSculptureIndex);
+        DialogStateProvider.getInstance().setDialogCompleted(false);
         Class<?> activityClass;
         switch (currentSculptureIndex) {
             case 0:
@@ -392,15 +387,27 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == SCULPTURE_ACTIVITY_REQUEST && resultCode == RESULT_OK) {
-            if (data != null && data.getBooleanExtra("move_to_next", false)) {
-                // Переходим к следующей точке только если диалоги завершены
+        android.util.Log.d("MainActivity", "onActivityResult вызван: requestCode = " + requestCode + ", resultCode = " + resultCode);
+        // проверяем реквест код который соответствует индексу скульптуры (0-9)
+        if (requestCode >= 0 && requestCode < sculpturePoints.length && resultCode == RESULT_OK) {
+            boolean moveToNext = false;
+            if (data != null) {
+                moveToNext = data.getBooleanExtra("move_to_next", false);
+            }
+            android.util.Log.d("MainActivity", "onActivityResult: moveToNext = " + moveToNext + ", currentSculptureIndex = " + currentSculptureIndex);
+            DialogStateProvider.getInstance().setDialogCompleted(moveToNext);
+            if (moveToNext) {
                 if (currentSculptureIndex < sculpturePoints.length - 1) {
                     currentSculptureIndex++;
+                    DialogStateProvider.getInstance().setCurrentDialogIndex(currentSculptureIndex);
                     isNearSculpture = false;
                     updateMap();
+                    android.util.Log.d("MainActivity", "переход к следующей точке: " + currentSculptureIndex);
                 }
+            } else {
+                isNearSculpture = false;
+                updateMap();
+                android.util.Log.d("MainActivity", "остаёмся на текущей точке: " + currentSculptureIndex);
             }
         }
     }
@@ -424,11 +431,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // При возврате из Activity переходим к следующей точке
-        if (isNearSculpture && currentSculptureIndex < sculpturePoints.length - 1) {
-            currentSculptureIndex++;
-            isNearSculpture = false;
-            updateMap();
-        }
+        // восставновление индекса из провайдера
+        currentSculptureIndex = DialogStateProvider.getInstance().getCurrentDialogIndex();
+        updateMap();
     }
 }
