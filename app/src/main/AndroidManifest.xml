@@ -87,6 +87,7 @@
 
         <activity android:name=".DoveGameActivity" />
         <activity android:name=".PuzzleGameActivity"/>
+        <activity android:name=".PrologActivity" />
 
 
     </application>
