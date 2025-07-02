@@ -114,7 +114,7 @@ public class RookGameActivity extends AppCompatActivity{
                 .setTitle("Победа!")
                 .setMessage("Вы набрали 30 очков!\nВы успешно завершили уровень и можете идти дальше.")
                 .setPositiveButton("Новая игра", (dialog, which) -> restartGame())
-                .setNegativeButton("Вернуться", (dialog, which)-> startActivity(new Intent(this, SnegurAndLadia.class)))
+                .setNegativeButton("Вернуться", (dialog, which) -> finish())
                 .setCancelable(false)
                 .setOnDismissListener(dialog -> {
                     if (!gameWon) {
