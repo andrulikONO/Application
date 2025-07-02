@@ -31,6 +31,7 @@ public class PrologActivity extends AppCompatActivity {
         ImageView backgroundImage = findViewById(R.id.backgroundImage);
         TextView dialogText = findViewById(R.id.dialogText);
         MaterialButton nextButton = findViewById(R.id.nextButton);
+        MaterialButton backButton = findViewById(R.id.backButton);
 
         backgroundImage.setImageResource(images[0]);
         dialogText.setText(texts[0]);
@@ -43,6 +44,16 @@ public class PrologActivity extends AppCompatActivity {
             } else {
                 Intent intent = new Intent(PrologActivity.this, MainActivity.class);
                 startActivity(intent);
+                finish();
+            }
+        });
+
+        backButton.setOnClickListener(v -> {
+            if (currentStep > 0) {
+                currentStep--;
+                backgroundImage.setImageResource(images[currentStep]);
+                dialogText.setText(texts[currentStep]);
+            } else {
                 finish();
             }
         });
