@@ -42,6 +42,7 @@ public class SnegurAndOstrovski extends AppCompatActivity {
         };
 
         Runnable onDialogsComplete = () -> {
+            DialogStateProvider.getInstance().setDialogCompleted(true);
             startActivity(new Intent(this, CongratulationsActivity.class));
         };
 
@@ -61,13 +62,6 @@ public class SnegurAndOstrovski extends AppCompatActivity {
                 null
         );
 
-        Runnable onDialogsComplete = () -> {
-            DialogStateProvider.getInstance().setDialogCompleted(true);
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra("move_to_next", true);
-            setResult(RESULT_OK, resultIntent);
-            finish();
-        };
 
         backButton.setOnClickListener(v -> {
             DialogStateProvider.getInstance().setDialogCompleted(false);
