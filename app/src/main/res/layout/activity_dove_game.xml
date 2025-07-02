@@ -12,8 +12,8 @@
 
     <ImageView
         android:id="@+id/dove"
-        android:layout_width="100dp"
-        android:layout_height="80dp"
+        android:layout_width="140dp"
+        android:layout_height="120dp"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
         android:src="@drawable/golub" />
