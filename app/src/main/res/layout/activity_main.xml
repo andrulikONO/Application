@@ -21,16 +21,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Следующая точка"
-            android:padding="12dp"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="10dp" />
 
         <Button
             android:id="@+id/skip_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Пропустить"
-            android:padding="12dp"
-            android:layout_marginStart="8dp"/>
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="10dp" />
     </LinearLayout>
 
 </RelativeLayout>
