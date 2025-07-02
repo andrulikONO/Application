@@ -41,6 +41,10 @@ public class SnegurAndOstrovski extends AppCompatActivity {
                 "Островский: — Вот и прекрасно, Значит, все сюжетные линии сошлись. Пойдём, внучка, мне есть что тебе рассказать"
         };
 
+        Runnable onDialogsComplete = () -> {
+            startActivity(new Intent(this, CongratulationsActivity.class));
+        };
+
         DialogManager dialogManager = new DialogManager(
                 dialogs,
                 dialogText,
@@ -53,7 +57,7 @@ public class SnegurAndOstrovski extends AppCompatActivity {
                 "Снегурочка",
                 "Островский",
                 null,
-                null,
+                onDialogsComplete,
                 null
         );
 

@@ -40,8 +40,6 @@ android {
 dependencies {
 
     implementation("com.yandex.android:maps.mobile:4.5.1-full")
-
-
     implementation("com.google.android.gms:play-services-location:21.0.1")
 
 
