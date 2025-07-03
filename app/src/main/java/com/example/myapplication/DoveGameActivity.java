@@ -25,8 +25,9 @@ public class DoveGameActivity extends AppCompatActivity {
     private Runnable flyRunnable;
     private Runnable fallRunnable;
 
-    private int requiredTaps = 5;
+    private int requiredTaps = 10;
     private int currentTaps = 0;
+    private boolean isNeg = false;
     private int tapProgress = 0; // Прогресс от каждого нажатия
 
     @Override
@@ -47,7 +48,7 @@ public class DoveGameActivity extends AppCompatActivity {
         nextText.setText("Нажмите на голубя " + requiredTaps + " раз");
 
         dove.post(() -> {
-            maxHeight = (int)((titleText.getBottom() - dove.getHeight()) * 0.9); // 90% высоты
+            maxHeight = 440; // 90% высоты
         });
 
         // Обработчик нажатия на голубя
@@ -65,13 +66,13 @@ public class DoveGameActivity extends AppCompatActivity {
                 flyRunnable = new Runnable() {
                     @Override
                     public void run() {
-                        if (dovePosition < tapProgress) {
+                        if (currentTaps < requiredTaps) {
                             dovePosition += 15; // Плавное увеличение позиции
                             dove.setTranslationY(-dovePosition);
                             handler.postDelayed(this, 30);
                         } else if (currentTaps >= requiredTaps) {
                             completeGame();
-                        } else {
+                        } else if (!isNeg) {
                             startFalling();
                         }
                     }
@@ -110,6 +111,7 @@ public class DoveGameActivity extends AppCompatActivity {
     }
 
     private void startFalling() {
+        isNeg = true;
         handler.removeCallbacks(flyRunnable);
         handler.post(fallRunnable);
     }
