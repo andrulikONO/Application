@@ -41,23 +41,25 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:background="#FFA0A0A0"
         android:gravity="center"
-        android:orientation="horizontal"
-        android:background="#FFA0A0A0">
+        android:orientation="horizontal">
 
-        <Button
+        <ImageButton
             android:id="@+id/leftButton"
             android:layout_width="80dp"
             android:layout_height="80dp"
+            android:layout_marginRight="80dp"
+            android:background="@drawable/left"
             android:text="←"
-            android:textSize="30sp"
-            android:layout_marginRight="50dp"/>
+            android:textSize="50sp" />
 
-        <Button
+        <ImageButton
             android:id="@+id/rightButton"
             android:layout_width="80dp"
             android:layout_height="80dp"
+            android:background="@drawable/right"
             android:text="→"
-            android:textSize="30sp"/>
+            android:textSize="30sp" />
     </LinearLayout>
 </LinearLayout>

@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -26,7 +27,7 @@ import java.util.Random;
 public class KotGameActivity extends AppCompatActivity {
     // Игровые элементы
     private ImageView player;
-    private Button leftButton, rightButton;
+    private ImageButton leftButton, rightButton;
     private FrameLayout gameContainer;
     private TextView scoreText;
 
@@ -422,7 +423,7 @@ public class KotGameActivity extends AppCompatActivity {
         // Создаем диалог победы
         new AlertDialog.Builder(this)
                 .setTitle("Поздравляем!")
-                .setMessage("Вы успешно собрали 30 объектов!")
+                .setMessage("Вы успешно собрали 30 рыбок!")
                 .setPositiveButton("Новая игра", (dialog, which) -> restartGame())
                 .setNegativeButton("Вернуться", (dialog, which) -> finish())
                 .setCancelable(false)
